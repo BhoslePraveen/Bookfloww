@@ -1,80 +1,115 @@
 package org.praveenit.bookfloww.service;
 
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.praveenit.bookfloww.dto.auth.GoogleTokenResponse;
+import org.praveenit.bookfloww.dto.auth.GoogleUserProfile;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class GoogleAuthService {
-	@Value("${google.client.id}")
-	private String clientId;
+    @Value("${google.client.id}")
+    private String clientId;
 
-	@Value("${google.client.secret}")
-	private String clientSecret;
+    @Value("${google.client.secret}")
+    private String clientSecret;
 
-	@Value("${google.redirect.uri}")
-	private String redirectUri;
+    @Value("${google.redirect.uri}")
+    private String redirectUri;
 
-	@Value("${google.token.uri}")
-	private String tokenUri;
+    @Value("${google.token.uri}")
+    private String tokenUri;
 
-	@Value("${google.userinfo.uri}")
-	private String userInfoUri;
+    @Value("${google.userinfo.uri}")
+    private String userInfoUri;
 
-	private final RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
-    @Autowired
-    public GoogleAuthService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    // Exchange authorization code for access token
+    public GoogleTokenResponse exchangeCodeForTokens(String code) {
+        log.info("Exchanging authorization code with Google");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("code", code);
+        body.add("client_id", clientId);
+        body.add("client_secret", clientSecret);
+        body.add("redirect_uri", redirectUri);
+        body.add("grant_type", "authorization_code");
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+
+        try {
+            ResponseEntity<GoogleTokenResponse> response =
+                    restTemplate.exchange(
+                            tokenUri,
+                            HttpMethod.POST,
+                            request,
+                            GoogleTokenResponse.class
+                    );
+
+            log.info("Google token exchange successful");
+            return response.getBody();
+
+        } catch (Exception ex) {
+            log.error("Google token exchange failed", ex);
+            throw ex;
+        }
     }
 
-	// Exchange authorization code for access token
-	public Map<String, Object> exchangeCodeForTokens(String code) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+    /**
+     * Fetch Google user profile using access token
+     */
+    public GoogleUserProfile getUserProfile(String accessToken) {
+        log.info("Fetching Google user profile");
 
-		// MultiValueMap for form data
-		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-		body.add("code", code);
-		body.add("client_id", clientId);
-		body.add("client_secret", clientSecret);
-		body.add("redirect_uri", redirectUri);
-		body.add("grant_type", "authorization_code");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
 
-		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-		Map<String, Object> response = restTemplate.postForObject(tokenUri, request, Map.class);
-		return response;
-	}
+        try {
+            ResponseEntity<GoogleUserProfile> response =
+                    restTemplate.exchange(
+                            userInfoUri,
+                            HttpMethod.GET,
+                            entity,
+                            GoogleUserProfile.class
+                    );
 
-	// fetch user profile from google
-	public Map<String, Object> getUserProfile(String accessToken) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setBearerAuth(accessToken);// set authorization header
-		HttpEntity<String> entity = new HttpEntity<>(headers);
-		ResponseEntity<Map> response=restTemplate.exchange(userInfoUri, HttpMethod.GET, entity, Map.class);
-		return response.getBody();
-	}
-	//Build Google login URL
-	public String buildGoogleLoginUrl() {
+            log.info("Google user profile fetched successfully");
+            return response.getBody();
 
-        return "https://accounts.google.com/o/oauth2/v2/auth"
-                + "?client_id=" + clientId
-                + "&redirect_uri=" + redirectUri
-                + "&response_type=code"
-                + "&scope=openid%20email%20profile"
-                + "&access_type=offline"
-                + "&prompt=consent";
+        } catch (RestClientException ex) {
+            log.error("Failed to fetch Google user profile", ex);
+            throw ex;
+        }
     }
 
+    /**
+     * Build Google login URL
+     */
+    public String buildGoogleLoginUrl() {
+        return UriComponentsBuilder
+                .fromUriString("https://accounts.google.com/o/oauth2/v2/auth")
+                .queryParam("client_id", clientId)
+                .queryParam("redirect_uri", redirectUri)
+                .queryParam("response_type", "code")
+                .queryParam("scope", "openid email profile")
+                .queryParam("access_type", "offline")
+                .queryParam("prompt", "consent")
+                .build()
+                .toUriString();
+    }
 }

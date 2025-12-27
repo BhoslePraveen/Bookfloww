@@ -1,18 +1,18 @@
-package org.praveenit.bookfloww.restcontroller;
-
-import java.time.Instant;
-import java.util.Map;
+package org.praveenit.bookfloww.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
+import java.util.Map;
+
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/dashboard")
 public class DashboardController {
 
-    @GetMapping("/dashboard")
+    @GetMapping("/")
     public ResponseEntity<?> getDashboard() {
         // Example data, just for testing
         return ResponseEntity.ok(Map.of(

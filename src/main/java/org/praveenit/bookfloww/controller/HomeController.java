@@ -1,4 +1,4 @@
-package org.praveenit.bookfloww.restcontroller;
+package org.praveenit.bookfloww.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

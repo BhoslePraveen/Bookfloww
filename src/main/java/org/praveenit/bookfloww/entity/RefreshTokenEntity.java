@@ -1,101 +1,60 @@
 package org.praveenit.bookfloww.entity;
 
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
+
 import java.time.Instant;
 
-import jakarta.persistence.*;
-
+@Setter
+@Getter
 @Entity
-@Table(name = "refresh_tokens")
+@Table(name = "refresh_tokens",
+        indexes = {
+                @Index(name = "idx_refresh_token_token_id", columnList = "token_id"),
+                @Index(name = "idx_refresh_token_status", columnList = "status"),
+                @Index(name = "idx_refresh_token_user", columnList = "user_id")
+        })
+@SQLRestriction("status = 'ACTIVE'")
 public class RefreshTokenEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-   
-	// HASHED UUID TOKEN
-    @Column(nullable = false, unique = true, length = 256)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * Public lookup identifier (UUID)
+     * Used for fast DB search
+     */
+    @Column(name = "token_id", nullable = false, unique = true, length = 36)
+    private String tokenId;
+
+    /**
+     * Secure hash of the raw refresh token
+     */
+    @Column(name = "token_hash", nullable = false, length = 256)
     private String tokenHash;
-	
-    // ENCRYPTED GOOGLE REFRESH TOKEN
-    @Column(length = 2048)
+
+    /**
+     * Encrypted Google refresh token (if OAuth login)
+     */
+    @Column(name = "google_refresh_token_enc", length = 2048)
     private String googleRefreshTokenEnc;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = false)
-	private User user;
+    @Column(name = "expiry_date", nullable = false)
+    private Instant expiryDate;
 
-	@Column(nullable = false)
-	private Instant expiryDate;
-
-	@Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TokenStatus status = TokenStatus.ACTIVE;
-	
-	public enum TokenStatus {
-	    ACTIVE,
-	    INACTIVE
-	}
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-	// getters and setters
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getTokenHash() {
-		return tokenHash;
-	}
-
-	public void setTokenHash(String tokenHash) {
-		this.tokenHash = tokenHash;
-	}
-
-	public String getGoogleRefreshTokenEnc() {
-		return googleRefreshTokenEnc;
-	}
-
-	public void setGoogleRefreshTokenEnc(String googleRefreshTokenEnc) {
-		this.googleRefreshTokenEnc = googleRefreshTokenEnc;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-	public Instant getExpiryDate() {
-		return expiryDate;
-	}
-
-	public void setExpiryDate(Instant expiryDate) {
-		this.expiryDate = expiryDate;
-	}
-
-	public TokenStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(TokenStatus status) {
-		this.status = status;
-	}
-
-	@Override
-	public String toString() {
-		return "RefreshTokenEntity [id=" + id + ", tokenHash=" + tokenHash + ", googleRefreshTokenEnc="
-				+ googleRefreshTokenEnc + ", expiryDate=" + expiryDate + ", status=" + status + "]";
-	}
-
-	
-
-	
-
-	
-
+    public enum TokenStatus {
+        ACTIVE,
+        INACTIVE
+    }
 }
