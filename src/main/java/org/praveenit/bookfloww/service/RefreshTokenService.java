@@ -2,31 +2,25 @@ package org.praveenit.bookfloww.service;
 
 import java.time.Instant;
 import java.util.UUID;
-
 import org.praveenit.bookfloww.entity.RefreshTokenEntity;
 import org.praveenit.bookfloww.entity.RefreshTokenEntity.TokenStatus;
 import org.praveenit.bookfloww.entity.User;
 import org.praveenit.bookfloww.repository.RefreshTokenRepository;
 import org.praveenit.bookfloww.security.impl.TokenError;
 import org.praveenit.bookfloww.security.impl.TokenException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class RefreshTokenService {
 
-	@Autowired
-	private RefreshTokenRepository refreshTokenRepository;
-
-	@Autowired
-	private HashService hashService;
-
-	@Autowired
-	private EncryptionService encryptionService;
+	private final RefreshTokenRepository refreshTokenRepository;
+	private final HashService hashService;
+	private final EncryptionService encryptionService;
 
 	// 7 days refresh token validity
 	// private final long refreshTokenDurationMs = 7 * 24 * 60 * 60 * 1000;

@@ -1,8 +1,6 @@
 package org.praveenit.bookfloww.service;
 
 import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -13,9 +11,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class GoogleAuthService {
+	
+	private final RestTemplate restTemplate;
+	
 	@Value("${google.client.id}")
 	private String clientId;
 
@@ -30,13 +33,6 @@ public class GoogleAuthService {
 
 	@Value("${google.userinfo.uri}")
 	private String userInfoUri;
-
-	private final RestTemplate restTemplate;
-
-    @Autowired
-    public GoogleAuthService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
 
 	// Exchange authorization code for access token
 	public Map<String, Object> exchangeCodeForTokens(String code) {
@@ -65,16 +61,20 @@ public class GoogleAuthService {
 		ResponseEntity<Map> response=restTemplate.exchange(userInfoUri, HttpMethod.GET, entity, Map.class);
 		return response.getBody();
 	}
-	//Build Google login URL
+	
+	// Build Google login URL
 	public String buildGoogleLoginUrl() {
 
-        return "https://accounts.google.com/o/oauth2/v2/auth"
-                + "?client_id=" + clientId
-                + "&redirect_uri=" + redirectUri
-                + "&response_type=code"
-                + "&scope=openid%20email%20profile"
-                + "&access_type=offline"
-                + "&prompt=consent";
-    }
+	    StringBuilder url = new StringBuilder("https://accounts.google.com/o/oauth2/v2/auth");
+	    url.append("?client_id=").append(clientId)
+	       .append("&redirect_uri=").append(redirectUri)
+	       .append("&response_type=code")
+	       .append("&scope=openid%20email%20profile")
+	       .append("&access_type=offline")
+	       .append("&prompt=consent");
+
+	    return url.toString();
+	}
+
 
 }

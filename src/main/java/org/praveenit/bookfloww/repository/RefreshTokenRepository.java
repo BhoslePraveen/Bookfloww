@@ -1,5 +1,4 @@
 package org.praveenit.bookfloww.repository;
-
 import java.util.List;
 import org.praveenit.bookfloww.entity.RefreshTokenEntity;
 import org.praveenit.bookfloww.entity.RefreshTokenEntity.TokenStatus;

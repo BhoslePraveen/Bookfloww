@@ -1,25 +1,21 @@
 package org.praveenit.bookfloww.service;
 
 import java.time.Instant;
-
 import org.praveenit.bookfloww.dto.TokenData;
 import org.praveenit.bookfloww.dto.TokenResponse;
 import org.praveenit.bookfloww.entity.RefreshTokenEntity;
 import org.praveenit.bookfloww.entity.User;
 import org.praveenit.bookfloww.security.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class OAuthService {
 
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private RefreshTokenService refreshTokenService;
+	 private final JwtUtil jwtUtil;
+	 private final RefreshTokenService refreshTokenService;
 
     @Value("${jwt.access.expiration}")
     private long accessTokenDurationMs;

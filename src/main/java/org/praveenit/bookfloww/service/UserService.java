@@ -1,17 +1,16 @@
 package org.praveenit.bookfloww.service;
 
 import java.time.LocalDate;
-
 import org.praveenit.bookfloww.entity.User;
 import org.praveenit.bookfloww.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
-	@Autowired
-	private UserRepository userRepository;
+	
+	private final UserRepository userRepository;
 
 	public User findOrCreateGoogleUser(String email, String name) {
 		return userRepository.findByEmail(email).orElseGet(() -> {
@@ -20,7 +19,6 @@ public class UserService {
 			user.setName(name);
 			user.setRole(User.UserRole.CLIENT);
 			user.setIsActive(true);
-
 			// Save first (ID generated here)
 			user = userRepository.save(user);
 

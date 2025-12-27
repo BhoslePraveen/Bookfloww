@@ -3,11 +3,9 @@ package org.praveenit.bookfloww.security;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
-
 import org.praveenit.bookfloww.entity.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -45,5 +43,4 @@ public class JwtUtil {
 	            .parseClaimsJws(token)   // validates + throws exceptions
 	            .getBody();              // returns claims if valid
 	}
-
 }
