@@ -22,7 +22,7 @@ public class SecurityConfig {
                                         "/oauth/**",             // all google oauth endpoints
                                         "/auth/**"               // refresh/login
                                 ).permitAll().
-                                requestMatchers("/api/**").authenticated()).
+                                requestMatchers("/dashboard/**").authenticated()).
                 addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
 
