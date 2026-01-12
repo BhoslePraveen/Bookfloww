@@ -12,7 +12,7 @@ import java.util.Map;
 @RequestMapping("/dashboard")
 public class DashboardController {
 
-    @GetMapping("/")
+    @GetMapping("/calender")
     public ResponseEntity<?> getDashboard() {
         // Example data, just for testing
         return ResponseEntity.ok(Map.of(
