@@ -14,11 +14,35 @@ public enum TokenError {
         "RE_LOGIN"
     ),
 
+    USER_NOT_FOUND(
+		    "user_not_found",
+		    "User does not exist or account is inactive",
+		    "RE_LOGIN"
+		    ),
+    
     INVALID_GRANT(
         "invalid_grant",
         "Invalid refresh token",
         "RE_LOGIN"
-    );
+    ),
+    
+    GOOGLE_TOKEN_FAILED(
+	        "google_token_failed",
+	        "Unable to refresh Google access token",
+	        "RE_LOGIN"
+	        ),
+
+	GOOGLE_NOT_LINKED(
+			"google_not_linked", 
+			"Google account is not linked. Please connect Google Calendar.",
+			"CONNECT_GOOGLE"
+			),
+
+	NO_ACTIVE_REFRESH_TOKEN(
+			"no_active_refresh_token", 
+			"No active session found. Please login again.", 
+			"RE_LOGIN"
+			);
 
     private final String code;
     private final String description;

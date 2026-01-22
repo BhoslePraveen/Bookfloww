@@ -48,6 +48,14 @@ public class User extends AuditStamp {
     )
     private Set<RefreshTokenEntity> refreshTokens = new HashSet<>();
     
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+
+    private Set<GoogleEventEntity> googleEvents = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+
+    private Set<BookingEntity> bookings = new HashSet<>();
+    
     public enum UserRole {
         ADMIN, PROVIDER, CLIENT
     }

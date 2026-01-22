@@ -13,5 +13,12 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
 				.body(new ErrorResponse(error.getCode(), error.getDescription(), error.getAction()));
 	}
+	
+	@ExceptionHandler(BookingException.class)
+	public ResponseEntity<ErrorResponse> handleBookingException(BookingException ex){
+		BookingError error=ex.getError();
+		return ResponseEntity.status(HttpStatus.CONFLICT)
+				.body(new ErrorResponse(error.getCode(), error.getDescription(), error.getAction()));
+	}
 
 }

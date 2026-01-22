@@ -31,6 +31,13 @@ public class GoogleAuthService {
 
     @Value("${google.userinfo.uri}")
     private String userInfoUri;
+    
+    @Value("${google.auth.uri}")
+    private String authUri;
+    
+    @Value("${google.oauth.scope}")
+    private String googleScope;
+
 
     private final RestTemplate restTemplate;
 
@@ -102,11 +109,11 @@ public class GoogleAuthService {
      */
     public String buildGoogleLoginUrl() {
         return UriComponentsBuilder
-                .fromUriString("https://accounts.google.com/o/oauth2/v2/auth")
+                .fromUriString(authUri)
                 .queryParam("client_id", clientId)
                 .queryParam("redirect_uri", redirectUri)
                 .queryParam("response_type", "code")
-                .queryParam("scope", "openid email profile")
+                .queryParam("scope", googleScope)
                 .queryParam("access_type", "offline")
                 .queryParam("prompt", "consent")
                 .build()
